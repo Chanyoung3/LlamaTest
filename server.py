@@ -1,58 +1,45 @@
-from flask import Flask, request, jsonify
-import requests
-import json
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+import pandas as pd
+import os
 
 app = Flask(__name__)
-CORS(app)  # CORS 설정 (프론트엔드에서 요청 허용)
+CORS(app)
 
-OLLAMA_API_URL = "http://localhost:11434/api/generate"
+# 글로벌 변수로 저장
+script_prompt = ""
 
-def ask_llama(conversation):
-    payload = {
-        "model": "llama3.1:latest",
-        "prompt": f"""
-다음 상담 데이터를 분석하고 정확한 JSON 형식으로 출력해줘.
+@app.route('/')
+def index():
+    return render_template('main.html')
 
-상담 데이터:
-{conversation}
+@app.route('/upload-script', methods=['POST'])
+def upload_script():
+    global script_prompt
 
-출력 예시:
-```json
-{{
-    "dialogue": [
-        {{"speaker": "고객", "text": "안녕하세요"}},
-        {{"speaker": "상담원", "text": "무엇을 도와드릴까요?"}}
-    ]
-}}""",
-"stream": False
-    }
-    
-    response = requests.post(OLLAMA_API_URL, json=payload)
+    file = request.files.get('script')
+    if not file:
+        return jsonify({"error": "No file uploaded"}), 400
 
-    if response.status_code == 200:
-        response_text = response.json().get("response", "").strip()
-        
-        try:
-            parsed_json = json.loads(response_text)
-            return parsed_json
-        except json.JSONDecodeError:
-            return {"error": "Invalid JSON format", "raw_response": response_text}
-    else:
-        return {"error": response.status_code, "message": response.text}
+    # 엑셀 읽기
+    try:
+        df = pd.read_excel(file)
+        script_text = "\n".join(df.astype(str).apply(lambda row: " ".join(row), axis=1).tolist())
+        script_prompt = f"이 기준 스크립트를 참고하여 응답해 주세요:\n\n{script_text}"
+        return jsonify({"message": "스크립트 저장 완료", "script_summary": script_text[:200]})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json()
-    user_message = data.get("message", "")
+# 예시: 채팅 요청 처리 (LLaMA 연동)
+@app.route('/llama-analyze', methods=['POST'])
+def analyze():
+    from llama_client import ask_llama  # 외부 함수 가져옴
 
-    if not user_message:
-        return jsonify({"reply": "메시지를 입력하세요."})
+    user_message = request.json.get('message', '')
+    global script_prompt
+    full_prompt = f"{script_prompt}\n\n{user_message}"
+    result = ask_llama(full_prompt)
+    return jsonify(result)
 
-    # LLAMA 모델 호출
-    output = ask_llama(user_message)
-
-    return jsonify({"reply": output})
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+if __name__ == '__main__':
+    app.run(port=5000)

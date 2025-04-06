@@ -40,42 +40,29 @@ function handleKeyPress(event) {
     }
 }
 
-async function fileUpload() {
-    let fileInput = document.getElementById("fileInput");
-    let file = fileInput.files[0];
+function setScript(){
+    const fileInput = document.getElementById("excel-upload");
+    const file = fileInput.files[0];
+  
     if (!file) {
-        alert("파일을 선택하세요!");
-        return;
+      alert("엑셀 파일을 선택해주세요.");
+      return;
     }
-
-    let formData = new FormData();
-    formData.append("file", file);
-
-    try {
-        let response = await fetch("http://127.0.0.1:5000/upload", {
-            method: "POST",
-            body: formData
-        });
-
-        let result = await response.json();
-        displayFile(result.file_url, file.name);
-    } catch (error) {
-        console.error("파일 업로드 오류:", error);
-        alert("파일 업로드에 실패했습니다.");
-    }
-}
-
-function displayFile(url, fileName) {
-    let chatBox = document.getElementById("chatMessages");
-    let fileMessage = document.createElement("div");
-    fileMessage.classList.add("alert", "alert-info", "mt-1");
-
-    let fileLink = document.createElement("a");
-    fileLink.href = url;
-    fileLink.textContent = `📁 ${fileName}`;
-    fileLink.target = "_blank";
-
-    fileMessage.appendChild(fileLink);
-    chatBox.appendChild(fileMessage);
-    chatBox.scrollTop = chatBox.scrollHeight;
+  
+    const formData = new FormData();
+    formData.append("script", file);
+  
+    fetch("/upload-script", {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert("스크립트가 저장되었습니다!");
+      console.log("스크립트 내용:", data);
+    })
+    .catch(err => {
+      console.error("업로드 오류:", err);
+      alert("스크립트 업로드 실패");
+    });
 }
