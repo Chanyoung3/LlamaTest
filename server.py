@@ -33,13 +33,13 @@ def upload_script():
 # 예시: 채팅 요청 처리 (LLaMA 연동)
 @app.route('/llama-analyze', methods=['POST'])
 def analyze():
-    from llama_client import ask_llama  # 외부 함수 가져옴
+    from llama_client import ask_llama
 
     user_message = request.json.get('message', '')
+    mode = request.json.get('mode', 'default')  # 'analyze' or 'default'
+
     global script_prompt
     full_prompt = f"{script_prompt}\n\n{user_message}"
-    result = ask_llama(full_prompt)
+    result = ask_llama(full_prompt, mode)
     return jsonify(result)
 
-if __name__ == '__main__':
-    app.run(port=5000)

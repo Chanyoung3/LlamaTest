@@ -4,26 +4,31 @@ async function sendMessage() {
     if (message === "") return;
 
     displayMessage(message, "alert-secondary");
+    input.value = "";
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/chat", {
+        const response = await fetch("http://127.0.0.1:5000/llama-analyze", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: message })
+            body: JSON.stringify({
+                message: message,
+                mode: "default"  // 또는 "analyze"로 전환 가능
+            })
         });
 
         const data = await response.json();
-        
-        if (data.reply.error) {
-            displayMessage("⚠ 오류: " + data.reply.error, "alert-danger");
+
+        if (data.error) {
+            displayMessage("⚠ 오류: " + data.error, "alert-danger");
         } else {
-            const replyText = JSON.stringify(data.reply, null, 2);
+            const replyText = data.response || JSON.stringify(data, null, 2);
             displayMessage(replyText, "alert-primary");
         }
     } catch (error) {
-        displayMessage("서버 오류 발생!", "alert-danger");
+        displayMessage("서버 오류 발생! " + error.message, "alert-danger");
     }
 }
+
 
 function displayMessage(text, style) {
     const chatBox = document.getElementById("chatMessages");

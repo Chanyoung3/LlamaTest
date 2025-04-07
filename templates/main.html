@@ -13,13 +13,13 @@
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input mt-2">
             <input type="text" id="chatInput" class="form-control" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">전송</button>
+            <button class="btn btn-primary" onclick="sendMessage()">전송</button>
         </div>
         <div>
         <div class="mt-3">
             <label for="excel-upload" class="form-label">📁 기준 스크립트 업로드</label>
             <input type="file" id="excel-upload" class="form-control" accept=".xlsx,.xls" />
-            <button class="btn btn-primary mt-2" onclick="uploadScript()">저장</button>
+            <button class="btn btn-primary" onclick="uploadScript()">저장</button>
         </div>
     </div>
     
