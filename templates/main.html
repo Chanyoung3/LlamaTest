@@ -19,7 +19,11 @@
         <div class="mt-3">
             <label for="excel-upload" class="form-label">📁 기준 스크립트 업로드</label>
             <input type="file" id="excel-upload" class="form-control" accept=".xlsx,.xls" />
-            <button class="btn btn-primary" onclick="uploadScript()">저장</button>
+            <button class="btn btn-primary" onclick="setScript()">저장</button>
+
+            <label for="data-upload" class="form-label">📁 상담 데이터</label>
+            <input type="file" id="data-upload" class="form-control"/>
+            <button class="btn btn-primary" onclick="setData()">저장</button>
         </div>
     </div>
     

@@ -15,7 +15,7 @@ def ask_llama(user_input, mode="default"):
         prompt = f"콜센터와 관련된 질문이나 대화에 친절히 응답해줘:\n\n{user_input}"
 
     payload = {
-        "model": "llama3:latest",
+        "model": "llama3.1:latest",
         "prompt": prompt,
         "stream": False
     }
