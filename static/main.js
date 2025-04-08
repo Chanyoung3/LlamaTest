@@ -3,7 +3,6 @@ async function sendMessage() {
     const message = input.value.trim();
     if (message === "") return;
 
-    // ✅ 사용자 메시지는 'user'로
     displayMessage(message, "user");
     input.value = "";
 
@@ -24,7 +23,6 @@ async function sendMessage() {
         } else {
             const replyText = data.response || JSON.stringify(data, null, 2);
 
-            // ✅ LLaMA 응답은 'llama'로
             displayMessage(replyText, "llama");
         }
     } catch (error) {
@@ -119,7 +117,6 @@ function setData() {
         if (data.status === "success") {
             displayMessage(`🧾 분석 미리보기:\n${data.preview}`, "llama");
 
-            // 다운로드 버튼 추가
             const downloadLink = document.createElement("a");
             downloadLink.href = data.file_url;
             downloadLink.download = "result.txt";
