@@ -6,7 +6,6 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# 글로벌 변수로 저장
 script_prompt = ""
 
 @app.route('/')
@@ -59,18 +58,18 @@ def data_script():
 
         full_dialogue = "\n".join(df.astype(str).apply(lambda row: " ".join(row), axis=1).tolist())
 
-        prompt = f"""다음은 여러 건의 고객 상담 대화 내용입니다. 전체 내용을 종합하여 다음 네 가지 항목에 대한 **전반적인 경향**이나 **요약 통계**를 제시해 주세요:
-
-1. 고객의 전반적인 감정 경향
-2. 주요 상담 유형
-3. 자주 발생하는 규정 위반 사례
-4. 상담의 전반적인 흐름이나 단계 구성
-
-상담 내용:
-\"\"\"{full_dialogue}\"\"\"
-
-결과는 보기 좋게 JSON 형식으로 요약해 주세요.
-"""
+        prompt = f"""
+        다음은 여러 건의 고객 상담 대화 내용입니다. 전체 내용을 종합하여 다음 네 가지 항목에 대해 한줄로 정리해 제시해 주세요:
+        1. 고객의 전반적인 감정 경향
+        2. 주요 상담 유형
+        3. 자주 발생하는 규정 위반 사례
+        4. 상담의 전반적인 흐름이나 단계 구성
+        
+        상담 내용:
+        \"\"\"{full_dialogue}\"\"\"
+        
+        결과는 보기 좋게 JSON 형식으로 요약해 주세요.
+        """
         llama_response = ask_llama(prompt, mode="analyze")
 
         if isinstance(llama_response, dict):
